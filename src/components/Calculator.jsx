@@ -198,7 +198,9 @@ export default function Calculator() {
   const [isB2B, setIsB2B] = useState(true);
   const [casesPerYear, setCasesPerYear] = useState(120);
   const [avgClaimAmount, setAvgClaimAmount] = useState(2500);
-  const [margin, setMargin] = useState(4);
+
+  // Fixed margin for compensation factor calculation (typical SMB margin)
+  const margin = 4;
 
   // Constants
   const INTERNAL_COST_PER_CASE = 25;
@@ -268,7 +270,7 @@ export default function Calculator() {
             <div className="flex justify-center lg:justify-start">
               <ToggleSwitch isB2B={isB2B} onChange={setIsB2B} />
             </div>
-            <div className="flex-1 grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-4">
               <SliderInput
                 label="Fälle / Jahr"
                 value={casesPerYear}
@@ -287,16 +289,6 @@ export default function Calculator() {
                 step={100}
                 icon={Euro}
                 prefix="€"
-              />
-              <SliderInput
-                label="Umsatzrendite"
-                value={margin}
-                onChange={setMargin}
-                min={1}
-                max={30}
-                icon={Percent}
-                unit="%"
-                tooltip="Die Umsatzrendite zeigt, wie viel Gewinn pro Euro Umsatz bleibt. Bei 4% Rendite bleiben von 100€ Umsatz nur 4€ Gewinn. Typisch: Handel 2-4%, Dienstleistung 5-10%, Software 15-25%."
               />
             </div>
           </div>
@@ -477,18 +469,30 @@ export default function Calculator() {
               </div>
             </div>
 
-            {/* Card 3: Kompensations-Hebel */}
+            {/* Card 3: Eintreibungszeit */}
             <div className="bg-white border border-gray-100 rounded-2xl p-4 shadow-sm">
               <div className="flex items-center gap-2 mb-2">
-                <TrendingUp className="w-4 h-4 text-amber-600" />
-                <span className="text-gray-600 text-sm font-medium">Kompensations-Faktor</span>
+                <Zap className="w-4 h-4 text-amber-600" />
+                <span className="text-gray-600 text-sm font-medium">Eintreibungszeit</span>
               </div>
-              <div className="flex items-baseline gap-1.5 mb-1">
-                <span className="text-2xl font-bold text-gray-900">{compensationFactor}x</span>
-                <span className="text-gray-500 text-xs">bei {margin}% Marge</span>
+              <div className="flex items-baseline gap-1.5 mb-2">
+                <span className="text-2xl font-bold text-brand-primary">21</span>
+                <span className="text-gray-500 text-sm">Tage Ø</span>
               </div>
-              <p className="text-gray-500 text-xs">
-                1 Ausfall braucht {compensationFactor} gute Aufträge zur Kompensation.
+              <div className="flex items-center gap-2 text-xs">
+                <span className="text-gray-400 line-through">41 Tage traditionell</span>
+                <span className="text-brand-success font-semibold">2x schneller</span>
+              </div>
+            </div>
+
+            {/* Card 4: Warum Ausfälle teuer sind */}
+            <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4">
+              <div className="flex items-center gap-2 mb-2">
+                <FileWarning className="w-4 h-4 text-amber-600" />
+                <span className="text-amber-800 text-sm font-medium">Warum jeder Ausfall zählt</span>
+              </div>
+              <p className="text-amber-700 text-xs leading-relaxed">
+                Eine nicht eingetriebene Forderung ist kein kleiner Verlust – sie frisst deinen gesamten Gewinn aus {compensationFactor} erfolgreichen Aufträgen.
               </p>
             </div>
 
