@@ -320,80 +320,90 @@ export default function Calculator() {
               <table className="w-full">
                 <thead>
                   <tr className="border-b border-gray-100">
-                    <th className="text-left py-2 pr-3 text-xs text-gray-500 font-medium uppercase">Kostenpunkt</th>
+                    <th className="text-left py-2 pr-3 text-xs text-gray-500 font-medium uppercase"></th>
                     <th className="py-2 px-3 text-center text-xs text-gray-500 font-medium uppercase">Traditionell</th>
                     <th className="py-2 pl-3 text-center text-xs text-brand-primary font-medium uppercase">incaseof.law</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-50">
-                  <ComparisonRow
-                    label="Interner Aufwand"
-                    icon={Clock}
-                    traditional={formatCurrency(totalInternalOld)}
-                    incaseof={formatCurrency(totalInternalNew)}
-                  />
-                  <ComparisonRow
-                    label="Material & Admin"
-                    icon={FileStack}
-                    traditional={formatCurrency(totalAdminOld)}
-                    incaseof={formatCurrency(0)}
-                  />
-                  <ComparisonRow
-                    label="KSV-Mitgliedschaft"
-                    icon={BadgePercent}
-                    traditional={formatCurrency(totalKSV)}
-                    incaseof={formatCurrency(0)}
-                  />
-                  <ComparisonRow
-                    label="Inkassogebühren"
-                    icon={Wallet}
-                    traditional={formatCurrency(totalInkassoFees)}
-                    incaseof={formatCurrency(0)}
-                    isHighlight={true}
-                  />
-                  <ComparisonRow
-                    label="Evidenzhaltung"
-                    icon={Archive}
-                    traditional={formatCurrency(totalEvidenceOld)}
-                    incaseof="Kostenlos"
-                  />
-                  <ComparisonRow
-                    label="Forderungsausfall"
-                    icon={FileWarning}
-                    traditional={`${TRADITIONAL_DEFAULT_RATE}% = ${formatCurrency(totalDefaultOld)}`}
-                    incaseof={`${INCASEOF_DEFAULT_RATE}% = ${formatCurrency(totalDefaultNew)}`}
-                    isHighlight={true}
-                  />
-                  {isB2B && (
-                    <ComparisonRow
-                      label="Verzugspauschale (B2B)"
-                      icon={ShieldCheck}
-                      traditional={formatCurrency(0)}
-                      incaseof={`+${formatCurrency(totalB2BBonus)}`}
-                    />
-                  )}
-                </tbody>
-                <tfoot>
-                  <tr className="border-t-2 border-gray-200 bg-gray-50">
+                <tbody>
+                  {/* Kosten - combined row */}
+                  <tr>
                     <td className="py-3 pr-3">
-                      <span className="text-gray-900 font-bold">Gesamtkosten / Jahr</span>
+                      <div className="flex items-center gap-2">
+                        <div className="p-1.5 rounded-lg bg-gray-100">
+                          <Wallet className="w-3.5 h-3.5 text-gray-500" />
+                        </div>
+                        <div>
+                          <span className="text-gray-900 font-medium text-sm">Kosten</span>
+                          <p className="text-xs text-gray-400">Material, Mitgliedschaften, Inkasso, Evidenzhaltung</p>
+                        </div>
+                      </div>
                     </td>
                     <td className="py-3 px-3 text-center">
-                      <span className="text-red-600 font-bold">{formatCurrency(totalTraditional)}</span>
+                      <span className="text-red-600 font-semibold text-sm">{formatCurrency(totalAdminOld + totalKSV + totalInkassoFees + totalEvidenceOld)}</span>
                     </td>
                     <td className="py-3 pl-3 text-center">
-                      <span className="text-brand-success font-bold">{formatCurrency(Math.max(0, totalIncaseof))}</span>
+                      <div className="flex items-center justify-center gap-1.5">
+                        <CheckCircle2 className="w-4 h-4 text-brand-success" />
+                        <span className="text-brand-success font-semibold text-sm">{formatCurrency(0)}</span>
+                      </div>
                     </td>
                   </tr>
-                  <tr className="bg-brand-bg-light/50">
-                    <td className="py-3 pr-3 rounded-bl-xl">
-                      <span className="text-brand-primary-dark font-bold">Netto-Einnahmen / Jahr</span>
+
+                  {/* Rückholung - how much more you recover */}
+                  <tr className="bg-brand-bg-light/30">
+                    <td className="py-3 pr-3">
+                      <div className="flex items-center gap-2">
+                        <div className="p-1.5 rounded-lg bg-brand-bg-light">
+                          <TrendingUp className="w-3.5 h-3.5 text-brand-primary" />
+                        </div>
+                        <div>
+                          <span className="text-gray-900 font-medium text-sm">Rückholquote</span>
+                          <p className="text-xs text-gray-400">Anteil der erfolgreich eingeholten Forderungen</p>
+                        </div>
+                      </div>
                     </td>
                     <td className="py-3 px-3 text-center">
-                      <span className="text-gray-600 font-bold">{formatCurrency(totalClaimVolume - totalTraditional)}</span>
+                      <span className="text-gray-600 font-semibold text-sm">{100 - TRADITIONAL_DEFAULT_RATE}%</span>
                     </td>
-                    <td className="py-3 pl-3 text-center rounded-br-xl">
-                      <span className="text-brand-primary font-bold">{formatCurrency(totalClaimVolume - Math.max(0, totalIncaseof))}</span>
+                    <td className="py-3 pl-3 text-center">
+                      <div className="flex items-center justify-center gap-1.5">
+                        <CheckCircle2 className="w-4 h-4 text-brand-success" />
+                        <span className="text-brand-success font-semibold text-sm">{100 - INCASEOF_DEFAULT_RATE}%</span>
+                      </div>
+                    </td>
+                  </tr>
+
+                  {/* Mehr zurückgeholt */}
+                  <tr className="bg-brand-bg-light/50">
+                    <td className="py-3 pr-3">
+                      <div className="flex items-center gap-2">
+                        <div className="p-1.5 rounded-lg bg-brand-primary/20">
+                          <ArrowRight className="w-3.5 h-3.5 text-brand-primary" />
+                        </div>
+                        <span className="text-brand-primary-dark font-medium text-sm">Mehr zurückgeholt</span>
+                      </div>
+                    </td>
+                    <td className="py-3 px-3 text-center">
+                      <span className="text-gray-400 text-sm">—</span>
+                    </td>
+                    <td className="py-3 pl-3 text-center">
+                      <span className="text-brand-primary font-bold text-sm">+{formatCurrency(totalDefaultOld - totalDefaultNew)}</span>
+                    </td>
+                  </tr>
+                </tbody>
+                <tfoot>
+                  <tr className="border-t-2 border-brand-primary bg-gradient-to-r from-brand-bg-light to-brand-bg-light/50">
+                    <td className="py-4 pr-3 rounded-bl-xl">
+                      <span className="text-brand-primary-dark font-bold text-base">Netto mehr Umsatz / Jahr</span>
+                    </td>
+                    <td className="py-4 px-3 text-center">
+                      <span className="text-gray-500 font-semibold">{formatCurrency(totalClaimVolume - totalTraditional)}</span>
+                    </td>
+                    <td className="py-4 pl-3 text-center rounded-br-xl">
+                      <div className="inline-flex items-center gap-2 bg-brand-primary text-white px-3 py-1.5 rounded-lg">
+                        <span className="font-bold text-lg">{formatCurrency(totalClaimVolume - Math.max(0, totalIncaseof))}</span>
+                      </div>
                     </td>
                   </tr>
                 </tfoot>
