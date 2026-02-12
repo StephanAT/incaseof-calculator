@@ -376,13 +376,24 @@ export default function Calculator() {
                 <tfoot>
                   <tr className="border-t-2 border-gray-200 bg-gray-50">
                     <td className="py-3 pr-3">
-                      <span className="text-gray-900 font-bold">Gesamt / Jahr</span>
+                      <span className="text-gray-900 font-bold">Gesamtkosten / Jahr</span>
                     </td>
                     <td className="py-3 px-3 text-center">
                       <span className="text-red-600 font-bold">{formatCurrency(totalTraditional)}</span>
                     </td>
                     <td className="py-3 pl-3 text-center">
                       <span className="text-brand-success font-bold">{formatCurrency(Math.max(0, totalIncaseof))}</span>
+                    </td>
+                  </tr>
+                  <tr className="bg-brand-bg-light/50">
+                    <td className="py-3 pr-3 rounded-bl-xl">
+                      <span className="text-brand-primary-dark font-bold">Netto-Einnahmen / Jahr</span>
+                    </td>
+                    <td className="py-3 px-3 text-center">
+                      <span className="text-gray-600 font-bold">{formatCurrency(totalClaimVolume - totalTraditional)}</span>
+                    </td>
+                    <td className="py-3 pl-3 text-center rounded-br-xl">
+                      <span className="text-brand-primary font-bold">{formatCurrency(totalClaimVolume - Math.max(0, totalIncaseof))}</span>
                     </td>
                   </tr>
                 </tfoot>
@@ -397,13 +408,13 @@ export default function Calculator() {
             <div className="bg-gradient-to-br from-brand-primary to-brand-primary-dark rounded-2xl p-4 text-white">
               <div className="flex items-center gap-2 mb-2">
                 <Wallet className="w-4 h-4 text-brand-secondary" />
-                <span className="text-brand-bg-light text-sm font-medium">Jährliche Ersparnis</span>
+                <span className="text-brand-bg-light text-sm font-medium">Liquiditäts-Boost</span>
               </div>
               <div className="text-3xl font-bold text-brand-secondary mb-1">
                 +{formatCurrency(Math.round(animatedLiquidityAdvantage))}
               </div>
               <p className="text-brand-bg-light text-xs">
-                Bei {casesPerYear} Fällen à {formatCurrency(avgClaimAmount)}
+                mehr Liquidität pro Jahr
               </p>
             </div>
 
@@ -449,7 +460,7 @@ export default function Calculator() {
 
         {/* CTA Section - Compact */}
         <div className="bg-gradient-to-r from-brand-primary to-brand-primary-dark rounded-2xl p-5 text-center text-white">
-          <p className="text-brand-bg-light text-sm mb-1">Dein jährlicher Vorteil</p>
+          <p className="text-brand-bg-light text-sm mb-1">So viel mehr bleibt bei dir</p>
           <div className="text-3xl font-bold text-brand-secondary mb-3">
             +{formatCurrency(Math.round(animatedLiquidityAdvantage))}
           </div>
@@ -457,7 +468,7 @@ export default function Calculator() {
             href="https://app.incaseof.law"
             className="inline-flex items-center gap-2 px-6 py-2.5 bg-white text-brand-primary-dark font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all hover:scale-105"
           >
-            Jetzt starten
+            Jetzt {formatCurrency(Math.round(liquidityAdvantage))} sichern
             <ArrowRight className="w-4 h-4" />
           </a>
         </div>
