@@ -1,9 +1,23 @@
 import { useState, useEffect, useRef } from 'react';
 import {
+  Building2,
+  Users,
+  TrendingUp,
   Clock,
-  ExternalLink,
-  MessageCircle,
-  Shield,
+  Wallet,
+  ArrowRight,
+  CheckCircle2,
+  XCircle,
+  Zap,
+  Calculator as CalcIcon,
+  Euro,
+  Percent,
+  FileStack,
+  Scale,
+  ShieldCheck,
+  BadgePercent,
+  FileWarning,
+  Archive,
   Info
 } from 'lucide-react';
 
@@ -55,22 +69,14 @@ function formatNumber(value, decimals = 0) {
   }).format(value);
 }
 
-// Format short currency (Mio for millions)
-function formatShortCurrency(value) {
-  if (value >= 1000000) {
-    return (value / 1000000).toLocaleString('de-DE', { maximumFractionDigits: 2 }) + ' Mio. €';
-  }
-  return formatNumber(value) + ' €';
-}
-
 // Tooltip component
 function Tooltip({ text }) {
   const [show, setShow] = useState(false);
 
   return (
-    <span className="icol-tooltip-wrapper">
+    <span className="relative inline-flex ml-1">
       <span
-        className="icol-tooltip-trigger"
+        className="inline-flex items-center justify-center text-brand-primary cursor-help opacity-70 hover:opacity-100 transition-opacity"
         onMouseEnter={() => setShow(true)}
         onMouseLeave={() => setShow(false)}
         onClick={() => setShow(!show)}
@@ -78,11 +84,111 @@ function Tooltip({ text }) {
         <Info size={14} />
       </span>
       {show && (
-        <span className="icol-tooltip-content">
+        <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-56 p-2.5 bg-gray-900 text-white text-xs font-normal normal-case tracking-normal leading-relaxed rounded-lg shadow-lg z-50">
           {text}
+          <span className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-gray-900"></span>
         </span>
       )}
     </span>
+  );
+}
+
+// Slider Input Component
+function SliderInput({ label, value, onChange, min, max, step = 1, icon: Icon, unit = '', prefix = '', tooltip }) {
+  const percentage = ((value - min) / (max - min)) * 100;
+
+  return (
+    <div className="space-y-2">
+      <div className="flex items-center justify-between">
+        <label className="flex items-center gap-1.5 text-xs font-semibold text-brand-primary-dark uppercase tracking-wide">
+          <Icon className="w-3.5 h-3.5 text-brand-primary" />
+          {label}
+          {tooltip && <Tooltip text={tooltip} />}
+        </label>
+        <div className="flex items-center gap-1">
+          <input
+            type="number"
+            value={value}
+            onChange={(e) => onChange(Math.min(max, Math.max(min, Number(e.target.value) || min)))}
+            className="w-20 bg-white border-2 border-brand-bg-light rounded-lg px-2 py-1 text-right text-gray-900 font-semibold text-sm focus:border-brand-primary focus:outline-none transition-all"
+          />
+          {unit && <span className="text-gray-500 text-xs w-6">{unit}</span>}
+        </div>
+      </div>
+      <div className="relative">
+        <div
+          className="absolute h-1 bg-gradient-to-r from-brand-primary to-brand-secondary rounded-full top-1/2 -translate-y-1/2 pointer-events-none"
+          style={{ width: `${percentage}%` }}
+        />
+        <input
+          type="range"
+          min={min}
+          max={max}
+          step={step}
+          value={value}
+          onChange={(e) => onChange(Number(e.target.value))}
+          className="w-full h-1 bg-brand-bg-light rounded-full appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:bg-brand-primary [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:shadow-md [&::-webkit-slider-thumb]:cursor-pointer [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-white"
+        />
+      </div>
+    </div>
+  );
+}
+
+// Toggle Switch Component
+function ToggleSwitch({ isB2B, onChange }) {
+  return (
+    <div className="flex items-center justify-center gap-2 p-1 bg-gray-100 rounded-xl">
+      <button
+        onClick={() => onChange(true)}
+        className={`flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+          isB2B
+            ? 'bg-white text-brand-primary-dark shadow-sm'
+            : 'bg-transparent text-gray-500 hover:text-gray-700'
+        }`}
+      >
+        <Building2 className="w-4 h-4" />
+        B2B
+      </button>
+      <button
+        onClick={() => onChange(false)}
+        className={`flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+          !isB2B
+            ? 'bg-white text-brand-primary-dark shadow-sm'
+            : 'bg-transparent text-gray-500 hover:text-gray-700'
+        }`}
+      >
+        <Users className="w-4 h-4" />
+        B2C
+      </button>
+    </div>
+  );
+}
+
+// Comparison Row Component
+function ComparisonRow({ label, icon: Icon, traditional, incaseof, isHighlight = false, isBetter = true }) {
+  return (
+    <tr className={isHighlight ? 'bg-brand-bg-light/50' : ''}>
+      <td className="py-2.5 pr-3">
+        <div className="flex items-center gap-2">
+          <div className={`p-1.5 rounded-lg ${isHighlight ? 'bg-brand-bg-light' : 'bg-gray-100'}`}>
+            <Icon className={`w-3.5 h-3.5 ${isHighlight ? 'text-brand-primary' : 'text-gray-500'}`} />
+          </div>
+          <span className="text-gray-900 font-medium text-sm">{label}</span>
+        </div>
+      </td>
+      <td className="py-2.5 px-3 text-center">
+        <div className="flex items-center justify-center gap-1.5">
+          {!isBetter && <XCircle className="w-3.5 h-3.5 text-red-400" />}
+          <span className="text-gray-600 text-sm">{traditional}</span>
+        </div>
+      </td>
+      <td className="py-2.5 pl-3 text-center">
+        <div className="flex items-center justify-center gap-1.5">
+          {isBetter && <CheckCircle2 className="w-3.5 h-3.5 text-brand-success" />}
+          <span className={`text-sm font-semibold ${isBetter ? 'text-brand-success' : 'text-gray-600'}`}>{incaseof}</span>
+        </div>
+      </td>
+    </tr>
   );
 }
 
@@ -95,282 +201,267 @@ export default function Calculator() {
   const [margin, setMargin] = useState(4);
 
   // Constants
-  const INTEREST_B2B = 10.73;
-  const INTEREST_B2C = 4.00;
-  const COST_PERS_OLD = 30;
-  const COST_MAT_OLD = 12;
-  const COST_PERS_NEW = 7.5;
-  const COST_MAT_NEW = 3;
-  const PCT_FEES = 0.16;
-  const MIN_FEE = 40;
-  const COST_EXTRA_OLD = 75;
-  const PCT_LOSS_OLD = 0.10;
-  const PCT_LOSS_NEW = 0.02;
+  const INTERNAL_COST_PER_CASE = 25;
+  const ADMIN_COST_PER_CASE = 12;
+  const KSV_ANNUAL_FEE = 300;
+  const TRADITIONAL_INKASSO_FEE_PERCENT = 15;
+  const TRADITIONAL_EVIDENCE_FEE = 5;
+  const TRADITIONAL_DEFAULT_RATE = 25;
+  const INCASEOF_DEFAULT_RATE = 12;
+  const INCASEOF_INTERNAL_COST = 1.5;
+  const B2B_DELAY_COMPENSATION = 40;
 
-  // Calculations - now based on total cases
-  const interestRate = isB2B ? INTEREST_B2B : INTEREST_B2C;
-  const feesPerCase = Math.max(avgClaimAmount * PCT_FEES, MIN_FEE);
-  const lossOldPerCase = avgClaimAmount * PCT_LOSS_OLD;
-  const lossNewPerCase = avgClaimAmount * PCT_LOSS_NEW;
+  // Per-case calculations
+  const ksvPerCase = KSV_ANNUAL_FEE / Math.max(casesPerYear, 1);
+  const traditionalInkassoFee = avgClaimAmount * (TRADITIONAL_INKASSO_FEE_PERCENT / 100);
+  const traditionalDefaultLoss = avgClaimAmount * (TRADITIONAL_DEFAULT_RATE / 100);
+  const incaseofDefaultLoss = avgClaimAmount * (INCASEOF_DEFAULT_RATE / 100);
 
-  // Total costs (based on all cases)
-  const totalPersonalOld = COST_PERS_OLD * casesPerYear;
-  const totalPersonalNew = COST_PERS_NEW * casesPerYear;
-  const totalMatOld = COST_MAT_OLD * casesPerYear;
-  const totalMatNew = COST_MAT_NEW * casesPerYear;
-  const totalFees = feesPerCase * casesPerYear;
-  const totalExtraOld = COST_EXTRA_OLD * casesPerYear;
-  const totalLossOld = lossOldPerCase * casesPerYear;
-  const totalLossNew = lossNewPerCase * casesPerYear;
+  // Total costs (yearly)
+  const totalInternalOld = INTERNAL_COST_PER_CASE * casesPerYear;
+  const totalInternalNew = INCASEOF_INTERNAL_COST * casesPerYear;
+  const totalAdminOld = ADMIN_COST_PER_CASE * casesPerYear;
+  const totalKSV = KSV_ANNUAL_FEE;
+  const totalInkassoFees = traditionalInkassoFee * casesPerYear;
+  const totalEvidenceOld = TRADITIONAL_EVIDENCE_FEE * casesPerYear;
+  const totalDefaultOld = traditionalDefaultLoss * casesPerYear;
+  const totalDefaultNew = incaseofDefaultLoss * casesPerYear;
+  const totalB2BBonus = isB2B ? B2B_DELAY_COMPENSATION * casesPerYear : 0;
 
-  const totalOld = totalPersonalOld + totalMatOld + totalFees + totalExtraOld + totalLossOld;
-  const totalNew = totalPersonalNew + totalMatNew + totalLossNew;
-  const yearlySaving = totalOld - totalNew;
+  const totalTraditional = totalInternalOld + totalAdminOld + totalKSV + totalInkassoFees + totalEvidenceOld + totalDefaultOld;
+  const totalIncaseof = totalInternalNew + totalDefaultNew - totalB2BBonus;
 
-  const savedDays = (45 * casesPerYear / 60 / 8);
-  const totalClaimVolume = avgClaimAmount * casesPerYear;
-  const revenueNeeded = totalClaimVolume / (margin / 100);
+  // Time savings
+  const traditionalHours = (casesPerYear * 30) / 60;
+  const incaseofHours = (casesPerYear * 2) / 60;
+  const savedDays = (traditionalHours - incaseofHours) / 8;
+
+  // Advantage
+  const liquidityAdvantage = totalTraditional - totalIncaseof;
+  const totalClaimVolume = casesPerYear * avgClaimAmount;
+  const requiredRevenue = totalClaimVolume / (margin / 100);
   const compensationFactor = Math.round(100 / margin);
 
   // Animated values
-  const animatedYearlySaving = useAnimatedNumber(yearlySaving);
+  const animatedLiquidityAdvantage = useAnimatedNumber(liquidityAdvantage);
   const animatedSavedDays = useAnimatedNumber(savedDays);
-  const animatedRevenueNeeded = useAnimatedNumber(revenueNeeded);
-
-  // Sync slider and input
-  const handleCasesSlider = (e) => setCasesPerYear(Number(e.target.value));
-  const handleCasesInput = (e) => {
-    const v = Math.min(2500, Math.max(1, parseInt(e.target.value) || 1));
-    setCasesPerYear(v);
-  };
+  const animatedRequiredRevenue = useAnimatedNumber(requiredRevenue);
 
   return (
-    <div className="icol-wrapper">
-      {/* Header */}
-      <div className="icol-header">
-        <svg className="icol-logo-img" viewBox="0 0 200 50" xmlns="http://www.w3.org/2000/svg">
-          <rect x="2" y="8" width="196" height="34" rx="4" fill="none" stroke="#1a1a1a" strokeWidth="3"/>
-          <text x="15" y="33" fontFamily="Helvetica Neue, Arial, sans-serif" fontSize="22" fontWeight="700" fill="#1a1a1a">in case of</text>
-        </svg>
-        <div className="icol-header-right">
-          <span className="icol-badge">Forderungsrechner</span>
-        </div>
-      </div>
+    <div className="w-full min-h-screen py-4 px-4 bg-gray-50">
+      <div className="max-w-5xl mx-auto">
 
-      {/* Toggle Section */}
-      <div className="icol-toggle-section">
-        <span
-          className={`icol-toggle-label ${isB2B ? 'active' : ''}`}
-          onClick={() => setIsB2B(true)}
-        >
-          B2B
-        </span>
-        <div
-          className={`icol-toggle-switch ${!isB2B ? 'b2c' : ''}`}
-          onClick={() => setIsB2B(!isB2B)}
-        />
-        <span
-          className={`icol-toggle-label ${!isB2B ? 'active' : ''}`}
-          onClick={() => setIsB2B(false)}
-        >
-          B2C
-        </span>
-        <div className="icol-toggle-info">
-          Verzugszinsen: <strong>{interestRate.toLocaleString('de-DE')}%</strong>
+        {/* Header - Compact */}
+        <div className="text-center mb-4">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-brand-bg-light border border-brand-primary/20 rounded-full mb-3">
+            <CalcIcon className="w-4 h-4 text-brand-primary" />
+            <span className="text-brand-primary-dark text-sm font-semibold">Forderungsrechner</span>
+          </div>
+          <h2 className="text-2xl font-bold text-gray-900">
+            Wie viel <span className="text-brand-primary">mehr</span> bleibt bei dir?
+          </h2>
         </div>
-      </div>
 
-      {/* Controls */}
-      <div className="icol-controls">
-        <div className="icol-input-group">
-          <label>Fälle / Jahr</label>
-          <div className="icol-slider-row">
-            <input
-              type="range"
-              min="10"
-              max="2500"
-              step="10"
-              value={casesPerYear}
-              onChange={handleCasesSlider}
-              className="icol-range"
-            />
-            <input
-              type="number"
-              min="1"
-              value={casesPerYear}
-              onChange={handleCasesInput}
-              className="icol-manual-input"
-            />
+        {/* Input Section - Compact */}
+        <div className="bg-white border border-gray-100 rounded-2xl shadow-sm p-4 mb-4">
+          <div className="flex flex-col lg:flex-row lg:items-end gap-4">
+            <div className="flex justify-center lg:justify-start">
+              <ToggleSwitch isB2B={isB2B} onChange={setIsB2B} />
+            </div>
+            <div className="flex-1 grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <SliderInput
+                label="Fälle / Jahr"
+                value={casesPerYear}
+                onChange={setCasesPerYear}
+                min={10}
+                max={500}
+                step={10}
+                icon={FileStack}
+              />
+              <SliderInput
+                label="Ø Forderung"
+                value={avgClaimAmount}
+                onChange={setAvgClaimAmount}
+                min={100}
+                max={20000}
+                step={100}
+                icon={Euro}
+                prefix="€"
+              />
+              <SliderInput
+                label="Umsatzrendite"
+                value={margin}
+                onChange={setMargin}
+                min={1}
+                max={30}
+                icon={Percent}
+                unit="%"
+                tooltip="Die Umsatzrendite zeigt, wie viel Gewinn pro Euro Umsatz bleibt. Bei 4% Rendite bleiben von 100€ Umsatz nur 4€ Gewinn. Typisch: Handel 2-4%, Dienstleistung 5-10%, Software 15-25%."
+              />
+            </div>
           </div>
         </div>
-        <div className="icol-input-group">
-          <label>Ø Forderung (€)</label>
-          <input
-            type="number"
-            value={avgClaimAmount}
-            step="100"
-            onChange={(e) => setAvgClaimAmount(Number(e.target.value) || 0)}
-            className="icol-input-field"
-          />
-        </div>
-        <div className="icol-input-group">
-          <label>
-            Umsatzrendite (%)
-            <Tooltip text="Die Umsatzrendite zeigt, wie viel Gewinn pro Euro Umsatz bleibt. Bei 4% Rendite bleiben von 100€ Umsatz nur 4€ Gewinn. Typische Werte: Handel 2-4%, Dienstleistung 5-10%, Software 15-25%." />
-          </label>
-          <input
-            type="number"
-            value={margin}
-            step="0.5"
-            min="0.5"
-            max="50"
-            onChange={(e) => setMargin(Number(e.target.value) || 4)}
-            className="icol-input-field"
-          />
-        </div>
-      </div>
 
-      {/* Main Content */}
-      <div className="icol-main-content">
-        {/* Table Area */}
-        <div className="icol-table-area">
-          <div className="icol-section-title">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-              <polyline points="14 2 14 8 20 8"/>
-            </svg>
-            Kostenvergleich für {formatNumber(casesPerYear)} Fälle/Jahr
-          </div>
-          <table className="icol-table">
-            <thead>
-              <tr>
-                <th>Kostenfaktor</th>
-                <th className="icol-num">Traditionell</th>
-                <th className="icol-num">incaseof.law</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>
-                  <div className="icol-row-title">Interne Personalkosten</div>
-                </td>
-                <td className="icol-num old">{formatCurrency(totalPersonalOld)}</td>
-                <td className="icol-num new">{formatCurrency(totalPersonalNew)}</td>
-              </tr>
-              <tr>
-                <td>
-                  <div className="icol-row-title">Material & Verwaltung</div>
-                </td>
-                <td className="icol-num old">{formatCurrency(totalMatOld)}</td>
-                <td className="icol-num new">{formatCurrency(totalMatNew)}</td>
-              </tr>
-              <tr>
-                <td>
-                  <div className="icol-row-title">Inkassogebühren</div>
-                </td>
-                <td className="icol-num old">{formatCurrency(totalFees)}</td>
-                <td className="icol-num new">{formatCurrency(0)}</td>
-              </tr>
-              <tr>
-                <td>
-                  <div className="icol-row-title">Evidenzhaltung & Einigung</div>
-                </td>
-                <td className="icol-num old">{formatCurrency(totalExtraOld)}</td>
-                <td className="icol-num new">{formatCurrency(0)}</td>
-              </tr>
-              <tr>
-                <td>
-                  <div className="icol-row-title">Forderungsausfall</div>
-                </td>
-                <td className="icol-num old">{formatCurrency(totalLossOld)}</td>
-                <td className="icol-num new">{formatCurrency(totalLossNew)}</td>
-              </tr>
-              <tr className="icol-total-row">
-                <td><div className="icol-row-title">GESAMT / JAHR</div></td>
-                <td className="icol-num old">{formatCurrency(totalOld)}</td>
-                <td className="icol-num new">{formatCurrency(totalNew)}</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+        {/* Main Content: Comparison (2/3) + Cards (1/3) */}
+        <div className="grid lg:grid-cols-3 gap-4 mb-4">
 
-        {/* Sidebar */}
-        <div className="icol-sidebar">
-          <div className="icol-result-hero">
-            <div className="icol-label-light">Jährliche Ersparnis</div>
-            <div className="icol-big-num">{formatShortCurrency(Math.round(animatedYearlySaving))}</div>
-          </div>
+          {/* Left: Comparison Table (2/3) */}
+          <div className="lg:col-span-2 bg-white border border-gray-100 rounded-2xl shadow-sm p-4">
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center gap-2">
+                <div className="p-1.5 bg-brand-bg-light rounded-lg">
+                  <Scale className="w-4 h-4 text-brand-primary" />
+                </div>
+                <h3 className="text-sm font-semibold text-gray-900">Kostenvergleich für {formatNumber(casesPerYear)} Fälle/Jahr</h3>
+              </div>
+            </div>
 
-          <div className="icol-benefit-box">
-            <div className="icol-benefit-title">Effizienz-Steigerung</div>
-            <div className="icol-benefit-val">
-              +<span className="highlight">{animatedSavedDays.toFixed(1).replace('.', ',')}</span> Arbeitstage/Jahr
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b border-gray-100">
+                    <th className="text-left py-2 pr-3 text-xs text-gray-500 font-medium uppercase">Kostenpunkt</th>
+                    <th className="py-2 px-3 text-center text-xs text-gray-500 font-medium uppercase">Traditionell</th>
+                    <th className="py-2 pl-3 text-center text-xs text-brand-primary font-medium uppercase">incaseof.law</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-50">
+                  <ComparisonRow
+                    label="Interner Aufwand"
+                    icon={Clock}
+                    traditional={formatCurrency(totalInternalOld)}
+                    incaseof={formatCurrency(totalInternalNew)}
+                  />
+                  <ComparisonRow
+                    label="Material & Admin"
+                    icon={FileStack}
+                    traditional={formatCurrency(totalAdminOld)}
+                    incaseof={formatCurrency(0)}
+                  />
+                  <ComparisonRow
+                    label="KSV-Mitgliedschaft"
+                    icon={BadgePercent}
+                    traditional={formatCurrency(totalKSV)}
+                    incaseof={formatCurrency(0)}
+                  />
+                  <ComparisonRow
+                    label="Inkassogebühren"
+                    icon={Wallet}
+                    traditional={formatCurrency(totalInkassoFees)}
+                    incaseof={formatCurrency(0)}
+                    isHighlight={true}
+                  />
+                  <ComparisonRow
+                    label="Evidenzhaltung"
+                    icon={Archive}
+                    traditional={formatCurrency(totalEvidenceOld)}
+                    incaseof="Kostenlos"
+                  />
+                  <ComparisonRow
+                    label="Forderungsausfall"
+                    icon={FileWarning}
+                    traditional={`${TRADITIONAL_DEFAULT_RATE}% = ${formatCurrency(totalDefaultOld)}`}
+                    incaseof={`${INCASEOF_DEFAULT_RATE}% = ${formatCurrency(totalDefaultNew)}`}
+                    isHighlight={true}
+                  />
+                  {isB2B && (
+                    <ComparisonRow
+                      label="Verzugspauschale (B2B)"
+                      icon={ShieldCheck}
+                      traditional={formatCurrency(0)}
+                      incaseof={`+${formatCurrency(totalB2BBonus)}`}
+                    />
+                  )}
+                </tbody>
+                <tfoot>
+                  <tr className="border-t-2 border-gray-200 bg-gray-50">
+                    <td className="py-3 pr-3">
+                      <span className="text-gray-900 font-bold">Gesamt / Jahr</span>
+                    </td>
+                    <td className="py-3 px-3 text-center">
+                      <span className="text-red-600 font-bold">{formatCurrency(totalTraditional)}</span>
+                    </td>
+                    <td className="py-3 pl-3 text-center">
+                      <span className="text-brand-success font-bold">{formatCurrency(Math.max(0, totalIncaseof))}</span>
+                    </td>
+                  </tr>
+                </tfoot>
+              </table>
             </div>
           </div>
 
-          <div className="icol-benefit-box">
-            <div className="icol-benefit-title">Erfolgsquote</div>
-            <div className="icol-benefit-val">
-              <span style={{ textDecoration: 'line-through', color: '#666', fontSize: '0.85rem' }}>60%</span>
-              {' → '}
-              <span className="highlight">95%</span>
-            </div>
-          </div>
+          {/* Right: Value Cards (1/3) */}
+          <div className="space-y-3">
 
-          <div className="icol-benefit-box">
-            <div className="icol-benefit-title">Kompensations-Faktor</div>
-            <div className="icol-benefit-val">
-              <span className="highlight">{compensationFactor}x</span>
-              <span style={{ fontSize: '0.75rem', color: '#888', marginLeft: '6px' }}>
-                bei {margin}% Marge
-              </span>
+            {/* Card 1: Liquiditäts-Boost */}
+            <div className="bg-gradient-to-br from-brand-primary to-brand-primary-dark rounded-2xl p-4 text-white">
+              <div className="flex items-center gap-2 mb-2">
+                <Wallet className="w-4 h-4 text-brand-secondary" />
+                <span className="text-brand-bg-light text-sm font-medium">Jährliche Ersparnis</span>
+              </div>
+              <div className="text-3xl font-bold text-brand-secondary mb-1">
+                +{formatCurrency(Math.round(animatedLiquidityAdvantage))}
+              </div>
+              <p className="text-brand-bg-light text-xs">
+                Bei {casesPerYear} Fällen à {formatCurrency(avgClaimAmount)}
+              </p>
             </div>
-          </div>
 
-          <a href="https://app.incaseof.law" className="icol-sidebar-cta">
+            {/* Card 2: Zeit-Gewinn */}
+            <div className="bg-white border border-gray-100 rounded-2xl p-4 shadow-sm">
+              <div className="flex items-center gap-2 mb-2">
+                <Clock className="w-4 h-4 text-blue-600" />
+                <span className="text-gray-600 text-sm font-medium">Zeit-Gewinn</span>
+              </div>
+              <div className="flex items-baseline gap-1.5">
+                <span className="text-2xl font-bold text-gray-900">{Math.round(animatedSavedDays)}</span>
+                <span className="text-gray-500 text-sm">Arbeitstage/Jahr</span>
+              </div>
+              <div className="mt-2 grid grid-cols-2 gap-2 text-xs">
+                <div className="bg-gray-50 rounded-lg p-1.5 text-center">
+                  <p className="text-gray-400">Vorher</p>
+                  <p className="text-gray-700 font-semibold">{Math.round(traditionalHours)} Std.</p>
+                </div>
+                <div className="bg-brand-bg-light rounded-lg p-1.5 text-center">
+                  <p className="text-brand-primary">Nachher</p>
+                  <p className="text-brand-primary-dark font-semibold">{Math.round(incaseofHours)} Std.</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Card 3: Kompensations-Hebel */}
+            <div className="bg-white border border-gray-100 rounded-2xl p-4 shadow-sm">
+              <div className="flex items-center gap-2 mb-2">
+                <TrendingUp className="w-4 h-4 text-amber-600" />
+                <span className="text-gray-600 text-sm font-medium">Kompensations-Faktor</span>
+              </div>
+              <div className="flex items-baseline gap-1.5 mb-1">
+                <span className="text-2xl font-bold text-gray-900">{compensationFactor}x</span>
+                <span className="text-gray-500 text-xs">bei {margin}% Marge</span>
+              </div>
+              <p className="text-gray-500 text-xs">
+                1 Ausfall braucht {compensationFactor} gute Aufträge zur Kompensation.
+              </p>
+            </div>
+
+          </div>
+        </div>
+
+        {/* CTA Section - Compact */}
+        <div className="bg-gradient-to-r from-brand-primary to-brand-primary-dark rounded-2xl p-5 text-center text-white">
+          <p className="text-brand-bg-light text-sm mb-1">Dein jährlicher Vorteil</p>
+          <div className="text-3xl font-bold text-brand-secondary mb-3">
+            +{formatCurrency(Math.round(animatedLiquidityAdvantage))}
+          </div>
+          <a
+            href="https://app.incaseof.law"
+            className="inline-flex items-center gap-2 px-6 py-2.5 bg-white text-brand-primary-dark font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all hover:scale-105"
+          >
             Jetzt starten
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-              <line x1="5" y1="12" x2="19" y2="12"/>
-              <polyline points="12 5 19 12 12 19"/>
-            </svg>
+            <ArrowRight className="w-4 h-4" />
           </a>
         </div>
-      </div>
 
-      {/* Footer - Compact */}
-      <div className="icol-footer">
-        <div className="icol-benefit-item">
-          <div className="icol-benefit-icon">
-            <ExternalLink className="w-4 h-4" />
-          </div>
-          <div className="icol-benefit-content">
-            <h4>API-Integration</h4>
-          </div>
-        </div>
-        <div className="icol-benefit-item">
-          <div className="icol-benefit-icon">
-            <Clock className="w-4 h-4" />
-          </div>
-          <div className="icol-benefit-content">
-            <h4>Echtzeit-Status</h4>
-          </div>
-        </div>
-        <div className="icol-benefit-item">
-          <div className="icol-benefit-icon">
-            <MessageCircle className="w-4 h-4" />
-          </div>
-          <div className="icol-benefit-content">
-            <h4>Direkt-Kommunikation</h4>
-          </div>
-        </div>
-        <div className="icol-benefit-item">
-          <div className="icol-benefit-icon">
-            <Shield className="w-4 h-4" />
-          </div>
-          <div className="icol-benefit-content">
-            <h4>Keine versteckten Kosten</h4>
-          </div>
-        </div>
       </div>
     </div>
   );
