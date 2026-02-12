@@ -1,29 +1,10 @@
 import { useState, useEffect, useRef } from 'react';
 import {
-  Building2,
-  Users,
-  TrendingUp,
   Clock,
-  Wallet,
-  ArrowRight,
-  CheckCircle2,
-  XCircle,
-  Zap,
-  Calculator as CalcIcon,
-  Euro,
-  Percent,
-  FileStack,
-  ToggleLeft,
-  ToggleRight,
-  Scale,
-  ShieldCheck,
-  BadgePercent,
-  FileWarning,
-  Archive,
   ExternalLink,
   MessageCircle,
   Shield,
-  DollarSign
+  Info
 } from 'lucide-react';
 
 // Animated counter hook
@@ -82,13 +63,35 @@ function formatShortCurrency(value) {
   return formatNumber(value) + ' €';
 }
 
+// Tooltip component
+function Tooltip({ text }) {
+  const [show, setShow] = useState(false);
+
+  return (
+    <span className="icol-tooltip-wrapper">
+      <span
+        className="icol-tooltip-trigger"
+        onMouseEnter={() => setShow(true)}
+        onMouseLeave={() => setShow(false)}
+        onClick={() => setShow(!show)}
+      >
+        <Info size={14} />
+      </span>
+      {show && (
+        <span className="icol-tooltip-content">
+          {text}
+        </span>
+      )}
+    </span>
+  );
+}
+
 // Main Calculator Component
 export default function Calculator() {
   // Input state
   const [isB2B, setIsB2B] = useState(true);
   const [casesPerYear, setCasesPerYear] = useState(120);
   const [avgClaimAmount, setAvgClaimAmount] = useState(2500);
-  const [writeOff, setWriteOff] = useState(50000);
   const [margin, setMargin] = useState(4);
 
   // Constants
@@ -104,24 +107,34 @@ export default function Calculator() {
   const PCT_LOSS_OLD = 0.10;
   const PCT_LOSS_NEW = 0.02;
 
-  // Calculations
+  // Calculations - now based on total cases
   const interestRate = isB2B ? INTEREST_B2B : INTEREST_B2C;
-  const fees = Math.max(avgClaimAmount * PCT_FEES, MIN_FEE);
-  const lossOld = avgClaimAmount * PCT_LOSS_OLD;
-  const lossNew = avgClaimAmount * PCT_LOSS_NEW;
-  const totalOld = COST_PERS_OLD + COST_MAT_OLD + fees + COST_EXTRA_OLD + lossOld;
-  const totalNew = COST_PERS_NEW + COST_MAT_NEW + lossNew;
-  const savingPerCase = totalOld - totalNew;
-  const yearlySaving = savingPerCase * casesPerYear;
+  const feesPerCase = Math.max(avgClaimAmount * PCT_FEES, MIN_FEE);
+  const lossOldPerCase = avgClaimAmount * PCT_LOSS_OLD;
+  const lossNewPerCase = avgClaimAmount * PCT_LOSS_NEW;
+
+  // Total costs (based on all cases)
+  const totalPersonalOld = COST_PERS_OLD * casesPerYear;
+  const totalPersonalNew = COST_PERS_NEW * casesPerYear;
+  const totalMatOld = COST_MAT_OLD * casesPerYear;
+  const totalMatNew = COST_MAT_NEW * casesPerYear;
+  const totalFees = feesPerCase * casesPerYear;
+  const totalExtraOld = COST_EXTRA_OLD * casesPerYear;
+  const totalLossOld = lossOldPerCase * casesPerYear;
+  const totalLossNew = lossNewPerCase * casesPerYear;
+
+  const totalOld = totalPersonalOld + totalMatOld + totalFees + totalExtraOld + totalLossOld;
+  const totalNew = totalPersonalNew + totalMatNew + totalLossNew;
+  const yearlySaving = totalOld - totalNew;
+
   const savedDays = (45 * casesPerYear / 60 / 8);
-  const reducedWriteOff = writeOff * 0.8;
-  const revenueNeeded = writeOff / (margin / 100);
+  const totalClaimVolume = avgClaimAmount * casesPerYear;
+  const revenueNeeded = totalClaimVolume / (margin / 100);
   const compensationFactor = Math.round(100 / margin);
 
   // Animated values
   const animatedYearlySaving = useAnimatedNumber(yearlySaving);
   const animatedSavedDays = useAnimatedNumber(savedDays);
-  const animatedReducedWriteOff = useAnimatedNumber(reducedWriteOff);
   const animatedRevenueNeeded = useAnimatedNumber(revenueNeeded);
 
   // Sync slider and input
@@ -170,7 +183,7 @@ export default function Calculator() {
       {/* Controls */}
       <div className="icol-controls">
         <div className="icol-input-group">
-          <label>Anzahl Fälle / Jahr</label>
+          <label>Fälle / Jahr</label>
           <div className="icol-slider-row">
             <input
               type="range"
@@ -201,17 +214,10 @@ export default function Calculator() {
           />
         </div>
         <div className="icol-input-group">
-          <label>Abschreibungen p.a. (€)</label>
-          <input
-            type="number"
-            value={writeOff}
-            step="1000"
-            onChange={(e) => setWriteOff(Number(e.target.value) || 0)}
-            className="icol-input-field"
-          />
-        </div>
-        <div className="icol-input-group">
-          <label>Umsatzrendite (%)</label>
+          <label>
+            Umsatzrendite (%)
+            <Tooltip text="Die Umsatzrendite zeigt, wie viel Gewinn pro Euro Umsatz bleibt. Bei 4% Rendite bleiben von 100€ Umsatz nur 4€ Gewinn. Typische Werte: Handel 2-4%, Dienstleistung 5-10%, Software 15-25%." />
+          </label>
           <input
             type="number"
             value={margin}
@@ -229,11 +235,11 @@ export default function Calculator() {
         {/* Table Area */}
         <div className="icol-table-area">
           <div className="icol-section-title">
-            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
               <polyline points="14 2 14 8 20 8"/>
             </svg>
-            Kostenvergleich pro Forderung
+            Kostenvergleich für {formatNumber(casesPerYear)} Fälle/Jahr
           </div>
           <table className="icol-table">
             <thead>
@@ -247,53 +253,45 @@ export default function Calculator() {
               <tr>
                 <td>
                   <div className="icol-row-title">Interne Personalkosten</div>
-                  <div className="icol-row-desc">30-45 Min. manuell vs. automatisiert</div>
                 </td>
-                <td className="icol-num old">{formatCurrency(COST_PERS_OLD, 2)}</td>
-                <td className="icol-num new">{formatCurrency(COST_PERS_NEW, 2)}</td>
+                <td className="icol-num old">{formatCurrency(totalPersonalOld)}</td>
+                <td className="icol-num new">{formatCurrency(totalPersonalNew)}</td>
               </tr>
               <tr>
                 <td>
                   <div className="icol-row-title">Material & Verwaltung</div>
-                  <div className="icol-row-desc">Porto, Software, Archivierung</div>
                 </td>
-                <td className="icol-num old">{formatCurrency(COST_MAT_OLD, 2)}</td>
-                <td className="icol-num new">{formatCurrency(COST_MAT_NEW, 2)}</td>
+                <td className="icol-num old">{formatCurrency(totalMatOld)}</td>
+                <td className="icol-num new">{formatCurrency(totalMatNew)}</td>
               </tr>
               <tr>
                 <td>
                   <div className="icol-row-title">Inkassogebühren</div>
-                  <div className="icol-row-desc">Provision & Bearbeitung (~16%)</div>
                 </td>
-                <td className="icol-num old">{formatCurrency(fees, 2)}</td>
-                <td className="icol-num new">{formatCurrency(0, 2)}</td>
+                <td className="icol-num old">{formatCurrency(totalFees)}</td>
+                <td className="icol-num new">{formatCurrency(0)}</td>
               </tr>
               <tr>
                 <td>
                   <div className="icol-row-title">Evidenzhaltung & Einigung</div>
-                  <div className="icol-row-desc">Überwachung, Ratenzahlung</div>
                 </td>
-                <td className="icol-num old">{formatCurrency(COST_EXTRA_OLD, 2)}</td>
-                <td className="icol-num new">{formatCurrency(0, 2)}</td>
+                <td className="icol-num old">{formatCurrency(totalExtraOld)}</td>
+                <td className="icol-num new">{formatCurrency(0)}</td>
               </tr>
               <tr>
                 <td>
                   <div className="icol-row-title">Forderungsausfall</div>
-                  <div className="icol-row-desc">Wertberichtigung (10% vs. 2%)</div>
                 </td>
-                <td className="icol-num old">{formatCurrency(lossOld, 2)}</td>
-                <td className="icol-num new">{formatCurrency(lossNew, 2)}</td>
+                <td className="icol-num old">{formatCurrency(totalLossOld)}</td>
+                <td className="icol-num new">{formatCurrency(totalLossNew)}</td>
               </tr>
               <tr className="icol-total-row">
-                <td><div className="icol-row-title">GESAMT PRO FALL</div></td>
-                <td className="icol-num old">{formatCurrency(totalOld, 2)}</td>
-                <td className="icol-num new">{formatCurrency(totalNew, 2)}</td>
+                <td><div className="icol-row-title">GESAMT / JAHR</div></td>
+                <td className="icol-num old">{formatCurrency(totalOld)}</td>
+                <td className="icol-num new">{formatCurrency(totalNew)}</td>
               </tr>
             </tbody>
           </table>
-          <div className="icol-disclaimer">
-            * Berechnung basiert auf Marktdurchschnittswerten. Tatsächliche Werte variieren je nach Branche.
-          </div>
         </div>
 
         {/* Sidebar */}
@@ -301,29 +299,12 @@ export default function Calculator() {
           <div className="icol-result-hero">
             <div className="icol-label-light">Jährliche Ersparnis</div>
             <div className="icol-big-num">{formatShortCurrency(Math.round(animatedYearlySaving))}</div>
-            <div className="icol-sub-text">Zusätzliche Liquidität</div>
-          </div>
-
-          <div className="icol-benefit-box">
-            <div className="icol-benefit-title">Ersparnis pro Fall</div>
-            <div className="icol-cost-compare">
-              <span className="old-cost">{formatCurrency(totalOld)}</span>
-              <span className="arrow">→</span>
-              <span className="new-cost">{formatCurrency(totalNew, 2)}</span>
-            </div>
           </div>
 
           <div className="icol-benefit-box">
             <div className="icol-benefit-title">Effizienz-Steigerung</div>
             <div className="icol-benefit-val">
               +<span className="highlight">{animatedSavedDays.toFixed(1).replace('.', ',')}</span> Arbeitstage/Jahr
-            </div>
-          </div>
-
-          <div className="icol-benefit-box">
-            <div className="icol-benefit-title">Reduzierte Ausfälle</div>
-            <div className="icol-benefit-val">
-              <span className="highlight">{formatShortCurrency(Math.round(animatedReducedWriteOff))}</span> weniger
             </div>
           </div>
 
@@ -336,8 +317,18 @@ export default function Calculator() {
             </div>
           </div>
 
+          <div className="icol-benefit-box">
+            <div className="icol-benefit-title">Kompensations-Faktor</div>
+            <div className="icol-benefit-val">
+              <span className="highlight">{compensationFactor}x</span>
+              <span style={{ fontSize: '0.75rem', color: '#888', marginLeft: '6px' }}>
+                bei {margin}% Marge
+              </span>
+            </div>
+          </div>
+
           <a href="https://app.incaseof.law" className="icol-sidebar-cta">
-            Jetzt Forderung einreichen
+            Jetzt starten
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
               <line x1="5" y1="12" x2="19" y2="12"/>
               <polyline points="12 5 19 12 12 19"/>
@@ -346,59 +337,7 @@ export default function Calculator() {
         </div>
       </div>
 
-      {/* Hebel Section */}
-      <div className="icol-hebel-section">
-        <div className="icol-hebel-card">
-          <div className="icol-hebel-title">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <line x1="12" y1="1" x2="12" y2="23"/>
-              <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
-            </svg>
-            Der Liquiditäts-Hebel
-          </div>
-          <div className="icol-hebel-value">{formatShortCurrency(Math.round(animatedRevenueNeeded))}</div>
-          <div className="icol-hebel-desc">
-            <strong>Mehrumsatz nötig:</strong> Um einen Forderungsausfall von <strong>{formatShortCurrency(writeOff)}</strong> zu kompensieren, müssen Sie bei <strong>{margin.toLocaleString('de-DE')}%</strong> Marge diesen Umsatz zusätzlich generieren.
-          </div>
-        </div>
-        <div className="icol-hebel-card">
-          <div className="icol-hebel-title">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/>
-              <polyline points="17 6 23 6 23 12"/>
-            </svg>
-            Kompensations-Faktor
-          </div>
-          <div className="icol-hebel-value">{compensationFactor}x</div>
-          <div className="icol-hebel-desc">
-            Bei <strong>{margin.toLocaleString('de-DE')}%</strong> Marge braucht 1 schlechter Auftrag <strong>{compensationFactor}</strong> gute zur Kompensation.
-          </div>
-        </div>
-      </div>
-
-      {/* Quote Section */}
-      <div className="icol-quote-section">
-        <div className="icol-quote">
-          Ein ausgefallener Auftrag braucht {compensationFactor} gute Aufträge, um kompensiert zu werden. incaseof.law reduziert Ihre Ausfälle um 80%.
-        </div>
-      </div>
-
-      {/* CTA Section */}
-      <div className="icol-cta-section">
-        <div className="icol-cta-text">
-          Bereit, Ihre Forderungen effizient einzutreiben?
-          <span>Starten Sie jetzt und sparen Sie bis zu 90% der Kosten</span>
-        </div>
-        <a href="https://app.incaseof.law" className="icol-cta-btn">
-          Jetzt Forderungen einreichen
-          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-            <line x1="5" y1="12" x2="19" y2="12"/>
-            <polyline points="12 5 19 12 12 19"/>
-          </svg>
-        </a>
-      </div>
-
-      {/* Footer */}
+      {/* Footer - Compact */}
       <div className="icol-footer">
         <div className="icol-benefit-item">
           <div className="icol-benefit-icon">
@@ -406,7 +345,6 @@ export default function Calculator() {
           </div>
           <div className="icol-benefit-content">
             <h4>API-Integration</h4>
-            <p>Nahtlose Anbindung</p>
           </div>
         </div>
         <div className="icol-benefit-item">
@@ -415,7 +353,6 @@ export default function Calculator() {
           </div>
           <div className="icol-benefit-content">
             <h4>Echtzeit-Status</h4>
-            <p>Volle Transparenz</p>
           </div>
         </div>
         <div className="icol-benefit-item">
@@ -424,7 +361,6 @@ export default function Calculator() {
           </div>
           <div className="icol-benefit-content">
             <h4>Direkt-Kommunikation</h4>
-            <p>Rückfragen klären</p>
           </div>
         </div>
         <div className="icol-benefit-item">
@@ -433,7 +369,6 @@ export default function Calculator() {
           </div>
           <div className="icol-benefit-content">
             <h4>Keine versteckten Kosten</h4>
-            <p>Transparente Preise</p>
           </div>
         </div>
       </div>
