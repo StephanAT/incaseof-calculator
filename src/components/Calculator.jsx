@@ -391,6 +391,30 @@ export default function Calculator() {
                       <span className="text-brand-primary font-bold text-sm">+{formatCurrency(totalDefaultOld - totalDefaultNew)}</span>
                     </td>
                   </tr>
+
+                  {/* Zeit gespart */}
+                  <tr>
+                    <td className="py-3 pr-3">
+                      <div className="flex items-center gap-2">
+                        <div className="p-1.5 rounded-lg bg-blue-100">
+                          <Clock className="w-3.5 h-3.5 text-blue-600" />
+                        </div>
+                        <div>
+                          <span className="text-gray-900 font-medium text-sm">Zeit gespart</span>
+                          <p className="text-xs text-gray-400">Interne Arbeitszeit pro Jahr</p>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="py-3 px-3 text-center">
+                      <span className="text-gray-600 text-sm">{Math.round(traditionalHours)} Std.</span>
+                    </td>
+                    <td className="py-3 pl-3 text-center">
+                      <div className="flex items-center justify-center gap-1.5">
+                        <CheckCircle2 className="w-4 h-4 text-brand-success" />
+                        <span className="text-brand-success font-semibold text-sm">{Math.round(incaseofHours)} Std.</span>
+                      </div>
+                    </td>
+                  </tr>
                 </tbody>
                 <tfoot>
                   <tr className="border-t-2 border-brand-primary bg-gradient-to-r from-brand-bg-light to-brand-bg-light/50">
@@ -438,6 +462,9 @@ export default function Calculator() {
                 <span className="text-2xl font-bold text-gray-900">{Math.round(animatedSavedDays)}</span>
                 <span className="text-gray-500 text-sm">Arbeitstage/Jahr</span>
               </div>
+              <p className="text-xs text-gray-500 mt-2">
+                Unser AI-Inkasso automatisiert den gesamten Prozess – du sparst dir interne Ressourcen.
+              </p>
               <div className="mt-2 grid grid-cols-2 gap-2 text-xs">
                 <div className="bg-gray-50 rounded-lg p-1.5 text-center">
                   <p className="text-gray-400">Vorher</p>
@@ -470,17 +497,25 @@ export default function Calculator() {
 
         {/* CTA Section - Compact */}
         <div className="bg-gradient-to-r from-brand-primary to-brand-primary-dark rounded-2xl p-5 text-center text-white">
-          <p className="text-brand-bg-light text-sm mb-1">So viel mehr bleibt bei dir</p>
-          <div className="text-3xl font-bold text-brand-secondary mb-3">
+          <p className="text-brand-bg-light text-sm mb-1">Gesamter finanzieller Vorteil</p>
+          <div className="text-3xl font-bold text-brand-secondary mb-4">
             +{formatCurrency(Math.round(animatedLiquidityAdvantage))}
           </div>
-          <a
-            href="https://app.incaseof.law"
-            className="inline-flex items-center gap-2 px-6 py-2.5 bg-white text-brand-primary-dark font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all hover:scale-105"
-          >
-            Jetzt {formatCurrency(Math.round(liquidityAdvantage))} sichern
-            <ArrowRight className="w-4 h-4" />
-          </a>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+            <a
+              href="https://app.incaseof.law"
+              className="inline-flex items-center gap-2 px-6 py-2.5 bg-white text-brand-primary-dark font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all hover:scale-105"
+            >
+              Jetzt {formatCurrency(Math.round(liquidityAdvantage))} sichern
+              <ArrowRight className="w-4 h-4" />
+            </a>
+            <a
+              href="https://app.incaseof.law"
+              className="inline-flex items-center gap-2 px-6 py-2.5 bg-brand-primary border-2 border-white text-white font-semibold rounded-xl hover:bg-brand-primary-dark transition-all"
+            >
+              Jetzt Forderung einreichen
+            </a>
+          </div>
         </div>
 
       </div>
