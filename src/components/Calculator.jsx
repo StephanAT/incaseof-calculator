@@ -407,6 +407,30 @@ export default function Calculator() {
                       </div>
                     </td>
                   </tr>
+
+                  {/* Eintreibungszeit */}
+                  <tr className="bg-brand-bg-light/30">
+                    <td className="py-3 pr-3">
+                      <div className="flex items-center gap-2">
+                        <div className="p-1.5 rounded-lg bg-amber-100">
+                          <Zap className="w-3.5 h-3.5 text-amber-600" />
+                        </div>
+                        <div>
+                          <span className="text-gray-900 font-medium text-sm">Eintreibungszeit</span>
+                          <p className="text-xs text-gray-400">Durchschnittliche Dauer bis Zahlung</p>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="py-3 px-3 text-center">
+                      <span className="text-gray-600 text-sm">41 Tage</span>
+                    </td>
+                    <td className="py-3 pl-3 text-center">
+                      <div className="flex items-center justify-center gap-1.5">
+                        <CheckCircle2 className="w-4 h-4 text-brand-success" />
+                        <span className="text-brand-success font-semibold text-sm">21 Tage</span>
+                      </div>
+                    </td>
+                  </tr>
                 </tbody>
                 <tfoot>
                   <tr className="border-t-2 border-brand-primary bg-gradient-to-r from-brand-bg-light to-brand-bg-light/50">
@@ -469,30 +493,17 @@ export default function Calculator() {
               </div>
             </div>
 
-            {/* Card 3: Eintreibungszeit */}
+            {/* Card 3: Kompensations-Faktor */}
             <div className="bg-white border border-gray-100 rounded-2xl p-4 shadow-sm">
               <div className="flex items-center gap-2 mb-2">
-                <Zap className="w-4 h-4 text-amber-600" />
-                <span className="text-gray-600 text-sm font-medium">Eintreibungszeit</span>
+                <TrendingUp className="w-4 h-4 text-gray-500" />
+                <span className="text-gray-600 text-sm font-medium">Kompensations-Faktor</span>
               </div>
               <div className="flex items-baseline gap-1.5 mb-2">
-                <span className="text-2xl font-bold text-brand-primary">21</span>
-                <span className="text-gray-500 text-sm">Tage Ø</span>
+                <span className="text-2xl font-bold text-gray-900">{compensationFactor}x</span>
               </div>
-              <div className="flex items-center gap-2 text-xs">
-                <span className="text-gray-400 line-through">41 Tage traditionell</span>
-                <span className="text-brand-success font-semibold">2x schneller</span>
-              </div>
-            </div>
-
-            {/* Card 4: Warum Ausfälle teuer sind */}
-            <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4">
-              <div className="flex items-center gap-2 mb-2">
-                <FileWarning className="w-4 h-4 text-amber-600" />
-                <span className="text-amber-800 text-sm font-medium">Warum jeder Ausfall zählt</span>
-              </div>
-              <p className="text-amber-700 text-xs leading-relaxed">
-                Eine nicht eingetriebene Forderung ist kein kleiner Verlust – sie frisst deinen gesamten Gewinn aus {compensationFactor} erfolgreichen Aufträgen.
+              <p className="text-gray-500 text-xs leading-relaxed">
+                Eine nicht eingetriebene Forderung frisst den Gewinn aus {compensationFactor} erfolgreichen Aufträgen.
               </p>
             </div>
 
